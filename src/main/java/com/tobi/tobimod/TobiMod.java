@@ -1,4 +1,4 @@
-package com.yourname.tobimod;
+package com.tobi.tobimod;
 
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -12,7 +12,7 @@ public class TobiMod {
 
     public TobiMod(IEventBus modBus) {
         LOGGER.info("Initializing Tobi Mod...");
-        
+
         // Phase 1 registrations will go here
     }
 }
