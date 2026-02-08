@@ -1,6 +1,7 @@
 package com.tobi.tobimod.client.keybinds;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.tobi.tobimod.TobiMod;
 import net.minecraft.client.KeyMapping;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -8,7 +9,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import org.lwjgl.glfw.GLFW;
 
-@EventBusSubscriber(modid = TobiMod.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(modid = TobiMod.MOD_ID, value = Dist.CLIENT)
 public class ModKeybindings {
 
     // Define all 8 keybindings
