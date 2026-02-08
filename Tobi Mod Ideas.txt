@@ -1,0 +1,1117 @@
+# 🎭 TOBI MOD - COMPLETE CONTEXT DOCUMENT
+## NeoForge 1.21.1 - Naruto Tobi/Obito Uchiha Abilities Mod
+
+---
+
+## 📋 PROJECT INFORMATION
+
+**Minecraft Version:** 1.21.1  
+**Mod Loader:** NeoForge  
+**Java Version:** 21  
+**IDE:** IntelliJ IDEA  
+**Mod ID:** `tobimod`  
+**Main Package:** `com.yourname.tobimod`
+
+**Project Status:** [In Development / Testing / etc.]  
+**NeoForge Version:** [Fill in exact version from build.gradle]
+
+---
+
+## 🎯 MOD OVERVIEW
+
+This mod implements Tobi/Obito Uchiha's abilities from Naruto anime/manga as a fully functional NeoForge mod. The mod focuses on Kamui-based abilities (dimensional/space-time manipulation), Sharingan genjutsu (mind control), and combat abilities using Black Receivers.
+
+**Core Philosophy:**
+- All abilities are keybind-activated (no items in hotbar required unless specified)
+- Abilities have realistic limitations (timers, cooldowns, immobilization)
+- Balanced for survival gameplay
+- Seamless client-server synchronization
+- Visual and audio feedback for all abilities
+
+---
+
+## 🔧 CORE SYSTEMS
+
+### System 1: Attribute Buffs (Passive)
+**When Mod is Active, Player Gets:**
+- +20 HP (40 total health instead of 20)
+- +8 attack damage (9 total with fist instead of 1)
+- +20% movement speed (0.12 instead of 0.10)
+- +100% jump strength (0.84 instead of 0.42)
+- 2-block step height (can walk up 2-block tall obstacles)
+- 100% knockback resistance (immune to knockback)
+- 100% fall damage immunity (no fall damage ever)
+- 100% fire damage immunity (fire extinguishes instantly)
+- Infinite night vision (no potion needed)
+- Infinite saturation (hunger never depletes)
+
+**Implementation Notes:**
+- Applied via attribute modifiers
+- Persist through death
+- Can be toggled on/off via config or command
+
+---
+
+## 🌀 ABILITY #1: KAMUI INTANGIBILITY
+
+### Description
+Tobi's signature defensive ability - become completely intangible by transferring body parts to the Kamui dimension. Attacks and projectiles pass through the player harmlessly.
+
+### Activation
+- **Keybind:** [Player chooses, suggest 'R']
+- **Type:** Toggle (press to turn on, press again to turn off)
+- **State Indicator:** Visual particle effect around player (subtle portal particles)
+
+### Mechanics
+
+#### When Active (Intangibility Mode):
+1. **Complete Invulnerability:**
+   - All damage is negated (mobs, players, environmental)
+   - Projectiles pass through (arrows, fireballs, etc.)
+   - Player cannot be pushed or knocked back
+   - Explosions deal no damage
+   - Fall damage still immune (from attribute buff)
+
+2. **Phase Through Entities:**
+   - Player can walk through mobs
+   - Player can walk through other players
+   - Mobs cannot pathfind to player (no aggro)
+   - Disable collision box or make player "ghost-like"
+
+3. **Visual Effects:**
+   - Subtle portal particles around player torso
+   - Slight transparency shader (if possible)
+   - Sharingan eye glow effect (red particle near head)
+
+4. **Limitations:**
+   - **30-second time limit** (hard cap)
+   - After 30 seconds → forced deactivation
+   - Action bar shows remaining time (e.g., "Kamui: 23s")
+   - After deactivation → 60-second cooldown before can reactivate
+
+5. **Restrictions While Active:**
+   - Player CANNOT attack (melee or ranged)
+   - Player CANNOT use items
+   - Player CANNOT break/place blocks
+   - Player CAN move, jump, sprint normally
+   - If player attempts attack/use → ability automatically deactivates
+
+#### Underground Phasing Sub-Ability:
+When intangibility is active AND player is underground (surrounded by solid blocks):
+
+1. **Automatic Spectator Mode:**
+   - Detect when player's head enters solid block
+   - Switch to spectator mode automatically
+   - Player can now fly through blocks
+   - Remains invisible to other players
+   - Keep intangibility timer running
+
+2. **Surface Detection:**
+   - When player returns to area with 3+ blocks of air above head
+   - Automatically return to survival mode
+   - Intangibility remains active (until timer runs out)
+
+3. **Use Cases:**
+   - Quick escape through floors
+   - Dodge attacks by phasing underground
+   - Fast repositioning through terrain
+
+### Technical Requirements
+- Client-server sync for timer
+- Damage cancellation via LivingHurtEvent
+- Collision detection manipulation
+- Spectator mode switching with state preservation
+- Visual particle effects (ClientTickEvent)
+- Sound effects (activation, deactivation, time warning at 5s remaining)
+
+### Edge Cases
+- If player logs out while active → deactivate on login
+- If player dies while active (shouldn't happen) → deactivate
+- If player enters water → ability continues
+- If player enters lava → still immune (attribute buff)
+- If dimension changes → ability continues
+
+---
+
+## 🌌 ABILITY #2: KAMUI TRAVEL
+
+### Description
+Enter pure spectator mode to fly freely and explore without restrictions. Exit at will by pressing keybind again.
+
+### Activation
+- **Keybind:** [Player chooses, suggest 'G']
+- **Type:** Toggle (press to enter, press again to exit)
+
+### Mechanics
+
+#### Entering Travel Mode:
+1. Press keybind → player enters spectator mode immediately
+2. No charge-up time
+3. No restrictions on movement
+4. Portal sound + particle effect on activation
+
+#### While in Travel Mode:
+1. **Spectator Mode Behavior:**
+   - Fly freely (creative-style flight)
+   - Pass through all blocks
+   - No collision with anything
+   - Invisible to other players
+   - Cannot interact with world
+   - Can see through walls
+
+2. **Visual Feedback:**
+   - Action bar shows "KAMUI TRAVEL MODE - Press [key] to exit"
+   - Subtle portal particle trail behind player
+   - First-person view remains normal
+
+3. **Restrictions:**
+   - Cannot attack
+   - Cannot use items
+   - Cannot break/place blocks
+   - Cannot open GUIs (inventories, chests, etc.)
+   - Can still open chat
+
+#### Exiting Travel Mode:
+1. Press keybind again
+2. Return to survival mode at current location
+3. Check for safe space (3 blocks of air above)
+4. If inside block → push player to nearest safe space
+5. Portal sound + particle effect on exit
+
+### Technical Requirements
+- Gamemode switching (survival ↔ spectator)
+- Safety checks for exit location
+- Client-server sync for state
+- Keybind detection
+- Visual/audio feedback
+
+### Edge Cases
+- If player logs out in travel mode → exit on login
+- If player enters different dimension → mode continues
+- If player dies somehow → shouldn't be possible
+- If player at world border → normal spectator restrictions apply
+- If player exits inside block → teleport to safe location
+
+---
+
+## ⚔️ ABILITY #3: KAMUI ATTACK (Kidnap)
+
+### Description
+Charge up Kamui to absorb nearby entities into the Kamui dimension, removing them from the world. Enemies disappear into the pocket dimension.
+
+### Activation
+- **Keybind:** [Player chooses, suggest 'C']
+- **Type:** Hold (must hold key for full duration)
+
+### Mechanics
+
+#### Charge Phase (3 seconds):
+1. **Player Immobilization:**
+   - Player CANNOT move (frozen in place)
+   - Player CANNOT rotate camera
+   - Player becomes vulnerable (cannot use other abilities)
+   - Visual: Player has "charging" pose if possible
+
+2. **Area of Effect:**
+   - 7-block radius sphere around player
+   - Visual: Expanding purple/dark spiral particles
+   - Sound: Continuous building whoosh sound
+
+3. **Enemy Effects During Charge:**
+   - All entities in radius get Slowness 255 (90% movement reduction)
+   - Glowing effect (white outline)
+   - Portal particles swirling toward player
+   - Sound: Distortion effect
+
+4. **Charge Indicators:**
+   - Action bar progress: "▰▰▱▱▱ KAMUI CHARGING ▱▱▱"
+   - Particle intensity increases
+   - Sound pitch increases
+
+5. **Interruption:**
+   - If player takes damage → charge cancelled
+   - If player releases key early → charge cancelled
+   - If player dies → charge cancelled
+   - Cooldown still applies if interrupted after 1+ seconds
+
+#### Activation Phase (After 3 seconds):
+1. **Entity Teleportation:**
+   - ALL entities within radius (except players) teleport to Kamui dimension
+   - Teleport coordinates: kamui:void at 0, 64, 0
+   - Entities tagged with "tobi_kidnapped" tag
+   - Entities set to PersistenceRequired:1b (won't despawn)
+
+2. **Visual/Audio:**
+   - Large explosion particle burst
+   - Loud portal sound
+   - Screen shake (if possible)
+   - All affected entities vanish simultaneously
+
+3. **Player State:**
+   - Released from immobilization
+   - Can move again
+   - Enters 60-second cooldown
+
+#### Target Restrictions:
+- **WILL be kidnapped:**
+  - All hostile mobs (zombies, skeletons, creepers, etc.)
+  - All passive mobs (cows, pigs, sheep, etc.)
+  - All neutral mobs (wolves, endermen, etc.)
+  - Item frames, armor stands (debatable - your choice)
+  - Minecarts, boats
+
+- **Will NOT be kidnapped:**
+  - Players (would be too OP in PvP)
+  - Boss mobs (Ender Dragon, Wither) - optional
+  - Villagers (optional - your choice)
+  - Named/tamed mobs (optional - to protect pets)
+
+### Technical Requirements
+- Player movement/rotation lock
+- Entity detection in radius
+- Cross-dimensional entity teleportation
+- Progress tracking (3-second timer)
+- Particle effects (spiral, explosion)
+- Sound effects (charge, whoosh, activation)
+- Cooldown system
+- Client-server synchronization
+
+### Edge Cases
+- If entity is in vehicle → remove from vehicle then teleport
+- If entity has passengers → teleport all together
+- If entity is holding items → items go with them
+- If entity is baby variant → grows up in dimension (optional)
+- If too many entities (50+) → lag consideration
+
+### Balance Notes
+- 3-second immobilization is HIGH RISK
+- 7-block radius is close range (player must get near enemies)
+- 60-second cooldown prevents spam
+- Cannot move during charge = vulnerable to ranged attacks
+
+---
+
+## 👁️ ABILITY #4: BASIC GENJUTSU (Eye Contact Freeze)
+
+### Description
+Lock eyes with an entity to freeze them in place using Sharingan genjutsu. As long as you look at them, they cannot move.
+
+### Activation
+- **Keybind:** [Player chooses, suggest 'V']
+- **Type:** Toggle (press to start targeting, press again to release)
+
+### Mechanics
+
+#### Targeting Phase:
+1. **Raycasting:**
+   - Continuous raycast from player's eyes
+   - Maximum range: 30 blocks
+   - Checks every tick (20 times per second)
+   - Pierces through transparent blocks (glass, leaves)
+
+2. **Target Detection:**
+   - First entity hit by raycast becomes target
+   - Visual: Red outline around target (glowing effect)
+   - Visual: Red particle beam from player's eyes to target
+   - Sound: Subtle "whoosh" sound on lock-on
+
+3. **Targeting Restrictions:**
+   - Can only target ONE entity at a time
+   - Must be non-player entity
+   - Must have line of sight
+   - Cannot target through solid blocks
+
+#### Frozen State:
+1. **While Target is Frozen:**
+   - Entity AI disabled (NoAI:1b tag)
+   - Entity cannot move, attack, or use abilities
+   - Entity continues to render normally
+   - Entity is immune to all damage FROM OTHER SOURCES (debatable - your choice)
+   - Glowing effect persists
+   - Red spiral particles around entity's head
+
+2. **Maintaining Genjutsu:**
+   - Player must keep looking at entity
+   - If player looks away for more than 1 second → entity unfreezes
+   - If player moves out of range (30+ blocks) → entity unfreezes
+   - If line of sight breaks (solid block) → entity unfreezes
+   - Action bar shows: "👁️ GENJUTSU ACTIVE - Target: [entity name]"
+
+3. **Duration:**
+   - No time limit (can maintain indefinitely)
+   - Only limited by player's attention
+   - Player can move while maintaining (but must keep looking)
+
+#### Releasing Genjutsu:
+1. **Manual Release:**
+   - Press keybind again → target unfreezes
+   - Sound: "Release" sound effect
+   - Particles dissipate
+
+2. **Automatic Release:**
+   - Look away from target for 1+ second
+   - Move more than 30 blocks away
+   - Line of sight broken
+   - Target takes damage from any source (optional - debatable)
+   - Player dies
+
+3. **After Release:**
+   - Entity AI restored (NoAI:0b)
+   - Entity resumes normal behavior
+   - 3-second cooldown before can re-target
+
+### Technical Requirements
+- Raycasting system (entity detection)
+- AI manipulation (NoAI tag)
+- Line-of-sight checking
+- Distance calculation
+- Look direction tracking
+- Particle effects (beam, spiral)
+- Sound effects
+- Client-server sync
+
+### Edge Cases
+- If target dies while frozen → auto-release, no cooldown
+- If target despawns → auto-release
+- If player enters different dimension → auto-release
+- If target enters different dimension → auto-release
+- If server lags → grace period before auto-release
+- If multiple players try to freeze same mob → first one wins
+
+### Balance Notes
+- Requires constant attention (can't multitask)
+- Only one target at a time
+- Vulnerable while concentrating
+- No damage buff (just crowd control)
+
+---
+
+## 🧠 ABILITY #5: ADVANCED GENJUTSU (Mind Control)
+
+### Description
+Place an advanced genjutsu on an entity that makes it attack other hostile mobs instead of the player. Turn enemies into temporary allies.
+
+### Activation
+- **Keybind:** [Player chooses, suggest 'B']
+- **Type:** Instant cast (single press)
+
+### Mechanics
+
+#### Casting:
+1. **Targeting:**
+   - Uses same raycasting as Basic Genjutsu
+   - Maximum range: 30 blocks
+   - Must have line of sight
+   - Instant cast (no charge time)
+
+2. **On Successful Cast:**
+   - Target gets "tobi_mind_controlled" tag
+   - Red spiral particles explode around target's head
+   - Target's eyes glow red (if possible)
+   - Sound: Loud "tsukuyomi" sound effect
+   - Action bar: "🌀 MIND CONTROL - [entity name] for 10s"
+
+#### Mind Control Effects (10 seconds):
+1. **AI Modification:**
+   - Entity stops targeting player
+   - Entity starts targeting nearest hostile mob
+   - Entity attacks other hostiles with normal damage
+   - Entity becomes immune to player damage (cannot accidentally kill ally)
+   - Entity moves at normal speed
+
+2. **Visual Feedback:**
+   - Controlled entity has red glowing eyes
+   - Controlled entity has red particle aura
+   - Controlled entity has "CONTROLLED" name tag above head (visible only to caster)
+
+3. **Behavior:**
+   - Controlled entity acts like it's on player's team
+   - Will defend player if player is attacked (near controlled entity)
+   - Will follow player loosely (8-block range)
+   - Will attack any hostile mob it sees (16-block range)
+   - Cannot open doors or use special abilities
+
+4. **Duration:**
+   - Lasts exactly 10 seconds
+   - Timer shows in action bar
+   - At 3 seconds remaining → warning sound
+   - At 0 seconds → effect ends
+
+#### After Effect Ends:
+1. **Restoration:**
+   - Entity AI returns to normal
+   - Entity goes back to hostile behavior
+   - Entity can target player again
+   - All effects and particles removed
+   - Brief "confusion" particle effect
+
+2. **Cooldown:**
+   - 30-second cooldown before can cast again
+   - Cooldown displayed in action bar when keybind pressed
+
+### Technical Requirements
+- Raycasting for targeting
+- AI goal manipulation (most complex part)
+- Entity goal selectors (remove player target, add mob targets)
+- Timer system (10-second effect)
+- Particle effects
+- Sound effects
+- Client-server synchronization
+- Cooldown system
+
+### AI Goal Manipulation Details:
+```
+Need to modify entity's goal selector:
+1. Remove target player goal
+2. Add target hostile mob goal (highest priority)
+3. Add follow player goal (low priority)
+4. After 10s → restore original goals
+```
+
+### Edge Cases
+- If controlled entity dies → no effect, cooldown still applies
+- If controlled entity despawns → no effect
+- If player dies → effect ends immediately
+- If player changes dimensions → effect ends
+- If target moves more than 64 blocks away → effect ends
+- If no hostile mobs nearby → controlled entity idles near player
+- If controlled entity was passive (cow, pig) → attacks hostiles anyway
+
+### Target Restrictions:
+- **CAN be controlled:**
+  - All hostile mobs
+  - All neutral mobs (enderman, wolf, etc.)
+  - Golems (iron golems turn temporarily hostile to mobs)
+
+- **CANNOT be controlled:**
+  - Players
+  - Passive mobs (cows, pigs) - no point, they don't attack
+  - Boss mobs (Ender Dragon, Wither)
+  - Already controlled entities
+
+### Balance Notes
+- Short 10-second duration (can't maintain army)
+- Long 30-second cooldown (only 1/3 uptime max)
+- Only one entity controlled at a time
+- High-value targets (enderman, blaze) especially powerful
+
+---
+
+## 🌀 ABILITY #6: KAMUI WARP (Dimensional Teleport)
+
+### Description
+Teleport to the Kamui pocket dimension for safety, then return to the exact spot you left from. Single-location round-trip teleportation.
+
+### Activation
+- **Keybind:** [Player chooses, suggest 'X']
+- **Type:** Hold (must hold for full duration)
+
+### Mechanics
+
+#### To Kamui Dimension (From Overworld):
+
+1. **Charge Phase (3 seconds):**
+   - Player must hold keybind
+   - Player is immobilized (cannot move or look around)
+   - Action bar shows progress: "▰▰▱▱▱ WARPING TO KAMUI ▱▱▱"
+   - Purple portal particles spiral around player
+   - Sound: Building portal sound
+
+2. **Position Saving:**
+   - Save exact coordinates (X, Y, Z with decimals)
+   - Save dimension ID
+   - Save rotation (yaw, pitch)
+   - Store in player capability/NBT
+
+3. **Teleportation:**
+   - After 3 seconds → instant teleport
+   - Destination: kamui:void dimension at 0, 64, 0
+   - Large portal particle explosion at departure point
+   - Sound: Loud enderman teleport sound
+   - Brief screen fade effect (if possible)
+
+4. **In Kamui Dimension:**
+   - Player in survival mode (not spectator)
+   - Can walk around on gray concrete platform
+   - Completely safe (no mobs spawn)
+   - Can access inventory, crafts, etc.
+   - Action bar shows: "📍 KAMUI DIMENSION - Hold [key] to return"
+
+#### From Kamui Dimension (Return):
+
+1. **Charge Phase (3 seconds):**
+   - Same charging mechanic as departure
+   - Action bar shows: "▰▰▱▱▱ RETURNING TO ORIGIN ▱▱▱"
+   - Aqua/cyan portal particles
+   - Sound: Reverse portal sound
+
+2. **Teleportation:**
+   - After 3 seconds → teleport to saved location
+   - Returns to EXACT saved coordinates and rotation
+   - Even if blocks were destroyed/placed at that location
+   - If location is unsafe (inside block) → push to nearest safe space
+   - Portal particles at arrival point
+   - Sound: Enderman teleport
+
+3. **Position Reset:**
+   - Clear saved location from storage
+   - Ability is now "reset" for next use
+   - Can immediately use again (no cooldown)
+
+### Technical Requirements
+- Position saving (NBT or capability)
+- Dimension teleportation
+- Player immobilization
+- 3-second charge timer
+- Safety checks on return
+- Particle effects
+- Sound effects
+- Client-server sync
+
+### Edge Cases
+- If player logs out in Kamui → saved location persists
+- If player dies in Kamui → respawns normally, saved location cleared
+- If player dies in overworld before returning → saved location cleared
+- If saved location is now in different dimension → still works
+- If player uses ability while already in Kamui → returns home
+- If player uses ability while in Nether → saves Nether position
+
+### Use Cases
+- Emergency escape from combat
+- Safe AFK spot
+- Temporary storage location
+- Exploration safety net
+- PvP escape
+
+### Balance Notes
+- 3-second immobility is vulnerability
+- No cooldown = can spam if safe
+- Single location only (not multiple waypoints)
+- Predictable return point (enemies can camp)
+
+---
+
+## 📍 ABILITY #7: KAMUI LOCATION MARKER (Waypoint System)
+
+### Description
+Set up to 10 permanent waypoints across dimensions. Teleport to any saved location via custom GUI. Includes manual coordinate input for precision teleports.
+
+### Activation
+- **Keybind:** [Player chooses, suggest 'Z']
+- **Type:** Instant (opens GUI)
+
+### GUI Layout
+```
+╔═══════════════════════════════════════╗
+║     KAMUI LOCATION MARKER             ║
+╠═══════════════════════════════════════╣
+║                                       ║
+║     [DELETE]  ← Control Buttons       ║
+║                                       ║
+║         ◉ ← Center: Manual Input      ║
+║   ◉           ◉ ← Waypoint Slots      ║
+║      ◉     ◉     (10 total)           ║
+║   ◉           ◉                       ║
+║      ◉     ◉                          ║
+║         ◉                             ║
+║                                       ║
+║      [SET LOCATION]                   ║
+║                                       ║
+╚═══════════════════════════════════════╝
+```
+
+### GUI Components
+
+#### 1. Center Wheel (Manual Teleport):
+- **Position:** Center of screen
+- **Appearance:** Large glowing ender pearl icon
+- **Function:** Manual coordinate input teleporter
+
+**When Clicked:**
+```
+Opens sub-GUI:
+┌─────────────────────────────┐
+│  MANUAL TELEPORT            │
+├─────────────────────────────┤
+│  X: [_________]             │
+│  Y: [_________]             │
+│  Z: [_________]             │
+│                             │
+│  [TELEPORT]  [CANCEL]       │
+└─────────────────────────────┘
+```
+
+- User types coordinates into text fields
+- X, Y, Z accept integers only
+- Dimension is current dimension (cannot change dimension)
+- Click "TELEPORT" → 3-second charge → teleport
+- Click "CANCEL" → return to main GUI
+
+#### 2. Waypoint Slots (10 around wheel):
+- **Position:** Arranged in circle around center
+- **Appearance:** When empty: Gray button with "+"
+- **Appearance:** When filled: Button with location name + coordinates
+
+**Empty Slot:**
+```
+┌─────────┐
+│    +    │
+│  Empty  │
+└─────────┘
+```
+
+**Filled Slot:**
+```
+┌──────────────────┐
+│  Home Base       │
+│  Overworld       │
+│  X: 100 Z: -250  │
+└──────────────────┘
+```
+
+**When Clicked (Empty):** Does nothing until location is set
+**When Clicked (Filled):** Initiates teleport to that location
+
+#### 3. SET LOCATION Button:
+- **Position:** Bottom center
+- **Appearance:** Green button
+- **Function:** Saves current location to selected slot
+
+**Process:**
+1. Click button
+2. Opens text input: "Enter location name:"
+3. User types name (max 16 characters)
+4. Selects which slot to save to (highlights next empty slot)
+5. Click confirm → current location saved
+
+**Saved Data:**
+- Name (custom text)
+- X, Y, Z coordinates
+- Dimension ID
+- Yaw, Pitch (optional)
+
+#### 4. DELETE Button:
+- **Position:** Top center
+- **Appearance:** Red button with trash icon
+- **Function:** Delete waypoints
+
+**Process:**
+1. Click button
+2. All waypoint slots highlight red
+3. Click any waypoint slot → delete confirmation popup
+4. Confirm → waypoint deleted (slot becomes empty)
+5. Click DELETE again or ESC → cancel delete mode
+
+### Teleportation Mechanics
+
+#### To Waypoint (Saved Location):
+1. Open GUI (press Z)
+2. Click on filled waypoint slot
+3. GUI closes
+4. 3-second charge begins:
+   - Player immobilized
+   - Action bar: "▰▰▱▱▱ TELEPORTING TO [Name] ▱▱▱"
+   - Purple portal particles
+   - Whoosh sound
+5. After 3 seconds:
+   - Teleport to saved coordinates
+   - Works cross-dimension (Overworld → Nether)
+   - Portal particles at arrival
+   - Enderman teleport sound
+
+#### To Manual Coordinates:
+1. Open GUI (press Z)
+2. Click center wheel (manual input)
+3. Enter X, Y, Z coordinates
+4. Click TELEPORT button
+5. Same 3-second charge as waypoint
+6. Teleports to exact coordinates (same dimension only)
+
+### Technical Requirements
+- Custom GUI screen (Minecraft GUI system)
+- Text input fields
+- Button components
+- Persistent data storage (10 waypoints per player)
+- NBT or capability system
+- Cross-dimensional teleportation
+- Charge timer (3 seconds)
+- Player immobilization
+- Safety checks (valid coordinates)
+- Client-server synchronization
+
+### Data Storage Structure:
+```java
+Player Data:
+- waypoints: Array[10]
+  - [0]: {name: "Home", x: 100, y: 64, z: -200, dim: "minecraft:overworld"}
+  - [1]: {name: "Nether Hub", x: 12, y: 70, z: -25, dim: "minecraft:the_nether"}
+  - [2]: empty
+  - [3]: empty
+  ...
+  - [9]: empty
+```
+
+### Edge Cases
+- If waypoint location is destroyed → still teleports (safety check pushes to safe spot)
+- If waypoint is in unloaded chunk → loads chunk then teleports
+- If manual coordinates are invalid (Y: -100) → error message, no teleport
+- If player logs out → all waypoints persist
+- If player dies → all waypoints persist
+- If charge is interrupted (damage) → teleport cancelled
+- If player moves during charge → teleport cancelled
+
+### GUI Interaction Rules
+- ESC key closes GUI
+- Can only open in survival/creative (not spectator)
+- Cannot open while immobilized by other abilities
+- Cannot open while in combat (recently damaged)
+- Cannot open in certain dimensions (optional restriction)
+
+### Balance Notes
+- 3-second charge = vulnerability during teleport
+- No cooldown on waypoints (unlimited use once set)
+- Limited to 10 waypoints (must choose wisely)
+- Permanent storage (never expires)
+- Manual input for precision but same-dimension only
+- Cross-dimensional travel for waypoints
+
+---
+
+## 🗡️ ABILITY #8: BLACK RECEIVERS (Special Weapon)
+
+### Description
+Summon Black Receivers, mystical rods used by Pain/Obito in Naruto. Weak base damage but can tag enemies and drain their life force.
+
+### Activation
+- **Keybind:** [Player chooses, suggest 'F']
+- **Type:** Toggle (press to summon, press again to despawn)
+
+### Mechanics
+
+#### Summoning Black Receivers:
+
+1. **Item Creation:**
+   - Press keybind → Black Receiver appears in main hand
+   - If main hand is occupied → item goes to first empty inventory slot
+   - If inventory is full → error message, item not created
+   - Sound: Materialization sound effect
+   - Particle: Black smoke particles
+
+2. **Item Properties:**
+   - **Appearance:** Black stick/rod (custom texture)
+   - **Name:** "Black Receiver" (dark red text)
+   - **Lore:** 
+     - "Chakra-disrupting rods"
+     - "Right-click to drain tagged enemies"
+   - **Stack Size:** 1 (cannot have multiple)
+   - **Durability:** Unbreakable
+   - **Damage:** 10.0 (5 hearts)
+
+#### Basic Attack (Left-Click):
+1. **Melee Attack:**
+   - Deals exactly 10 damage (no more, no less)
+   - Ignores armor (optional - your choice)
+   - Attack speed: 1.2 (slightly slower than sword)
+   - Reach: 3.5 blocks (slightly longer than normal)
+
+2. **Tagging Effect:**
+   - When entity is hit → apply "tobi_tagged" tag
+   - Tagged entity gets red outline (glowing effect)
+   - Tagged entity has red particle effect on torso
+   - Sound: "Tag" sound effect
+   - Action bar: "🎯 Tagged: [entity name]"
+
+3. **Tag Duration:**
+   - Tags last 30 seconds
+   - Timer shows above entity's head (or in action bar)
+   - Tag is removed if:
+     - Entity dies
+     - 30 seconds elapse
+     - Entity is drained (right-click ability)
+     - Player despawns Black Receiver
+
+4. **Multiple Tags:**
+   - Can tag multiple entities
+   - No limit on number of tagged entities
+   - Each has independent 30-second timer
+
+#### Special Ability (Right-Click):
+
+1. **Life Drain Activation:**
+   - Right-click with Black Receiver (not sneaking)
+   - Sound: Loud "drain" sound effect
+   - Player animation: Raise rod in air (if possible)
+   - Particle: Black tendrils shoot from rod to all tagged entities
+
+2. **Drain Effect:**
+   - ALL tagged entities simultaneously take damage
+   - Damage = 33% of their MAXIMUM health (1/3 max HP)
+   - Example: Entity with 30 HP → takes 10 damage
+   - Example: Entity with 100 HP → takes 33 damage
+   - Visual: Red damage particles on each entity
+   - Sound: Entity hurt sounds
+
+3. **After Drain:**
+   - All "tobi_tagged" tags are removed
+   - Glowing effects removed
+   - 10-second cooldown before can drain again
+   - Action bar: "⚡ DRAINED - Cooldown: 10s"
+   - Tags can be reapplied immediately after drain
+
+4. **Player Feedback:**
+   - Show number of entities drained
+   - Total damage dealt (sum of all entities)
+   - Example: "⚡ Drained 3 enemies for 45 total damage"
+
+#### Despawning Black Receivers:
+
+1. **Manual Despawn:**
+   - Press keybind again → item disappears
+   - If item is in hand → removes from hand
+   - If item is in inventory → removes from inventory
+   - Sound: Dematerialization sound
+   - Particle: Black smoke poof
+
+2. **Auto-Despawn Conditions:**
+   - If player dies → item despawns
+   - If player drops item → item despawns after 5 seconds
+   - If player logs out → item despawns
+   - Cannot be placed in chests or given to other players
+
+### Technical Requirements
+- Custom item creation
+- NBT tags to prevent duplication
+- Entity tagging system
+- Percentage-based damage calculation
+- Glowing effect application
+- Particle effects (tagging, draining)
+- Sound effects
+- Cooldown system
+- Item deletion system
+- Client-server synchronization
+
+### Damage Calculation:
+```java
+For each tagged entity:
+1. Get entity's max health attribute
+2. Calculate: damage = maxHealth / 3
+3. Deal damage to entity
+4. Remove tag
+```
+
+### Edge Cases
+- If tagged entity dies before drain → tag removed, no effect
+- If tagged entity despawns → tag lost
+- If player has Black Receiver and tries to summon again → error message
+- If Black Receiver is dropped → despawns after 5 seconds (cannot be stolen)
+- If Black Receiver is placed in chest → automatically removed
+- If player in creative mode → same mechanics apply
+- If entity is immune to damage → drain fails, tag removed
+- If entity is at 1 HP → drain kills it
+
+### Balance Notes
+- Weak base damage (10) compared to swords
+- Drain is HIGH DAMAGE (33% max HP)
+- Drain requires setup (must tag first)
+- 10-second cooldown prevents spam
+- Tags expire (30s) so cannot tag everything and wait
+- Only one Black Receiver at a time
+
+### Combat Strategy:
+1. Summon Black Receiver
+2. Tag multiple enemies (left-click)
+3. Retreat to safe position
+4. Right-click to drain all tagged enemies
+5. Massive AOE damage (if multiple tagged)
+6. Repeat after 10-second cooldown
+
+---
+
+## 🌌 KAMUI DIMENSION SPECIFICATIONS
+
+### Dimension Details
+- **Dimension ID:** `tobimod:kamui_void`
+- **Dimension Type:** Custom (based on The End)
+- **Biome:** Custom void biome
+
+### World Generation
+1. **Terrain:**
+   - Flat gray concrete platform at Y=64
+   - 51x51 blocks (centered at 0, 0)
+   - Bedrock layer at Y=0 (5 layers deep)
+   - Void above and below
+
+2. **Spawn Point:**
+   - X: 0, Y: 65, Z: 0
+   - Player spawns on center of platform
+   - Safe spawn (no suffocation)
+
+3. **Environment:**
+   - Black sky (like The End)
+   - No sun/moon
+   - No day/night cycle
+   - Ambient light level: 0 (pitch black except platform)
+   - Platform has light level: 15 (glowstone under concrete)
+
+4. **Restrictions:**
+   - No natural mob spawning
+   - No structures
+   - No caves or terrain generation
+   - Infinite void in all directions
+
+### Purpose
+- Prison for kidnapped entities (Kamui Attack)
+- Safe room (Kamui Warp)
+- Storage dimension
+- PvP-free zone (optional)
+
+### Technical Implementation
+```json
+Dimension JSON:
+- type: "tobimod:kamui_void"
+- generator: flat with gray_concrete
+- biome: "tobimod:void_biome"
+- effects: "minecraft:the_end" (black sky)
+```
+
+---
+
+## 🎨 VISUAL & AUDIO DESIGN
+
+### Particle Effects
+- **Kamui Abilities:** Purple/dark purple portal particles, spiral pattern
+- **Genjutsu:** Red dust particles, beam from eyes, spiral around head
+- **Black Receivers:** Black smoke, red tendrils
+- **Teleportation:** Explosion particles, portal particles, end rod beams
+
+### Sound Effects
+- **Kamui:** Portal sounds, enderman teleport, whoosh effects
+- **Genjutsu:** Tsukuyomi sound (wither hurt), subtle whoosh
+- **Black Receivers:** Materialize/dematerialize sounds, drain effect
+- **Charging:** Building whoosh, pitch increases
+
+### Action Bar Messages
+- Always show current ability status
+- Show timers with visual progress bars
+- Use colors: Red (danger), Yellow (warning), Green (ready), Purple (kamui), Aqua (travel)
+- Keep messages concise (max 40 characters)
+
+---
+
+## ⚙️ TECHNICAL CONSIDERATIONS
+
+### Client-Server Synchronization
+All abilities MUST sync properly between client and server:
+- Keybind pressed on client → packet sent to server
+- Server validates ability use (cooldown, conditions)
+- Server executes ability logic
+- Server sends result packet to client
+- Client displays visual/audio feedback
+
+### Performance Optimization
+- Raycasting limited to 30 blocks (not infinite)
+- Particle effects scaled based on distance (don't render far particles)
+- Entity checks limited to relevant radius (don't check entire world)
+- Timers use efficient tick counting (not date/time)
+
+### Save Data Persistence
+Store in player capability or NBT:
+- Waypoints (10 locations)
+- Ability cooldowns
+- Kamui Warp saved location
+- Tagged entities (Black Receivers)
+- Intangibility timer
+
+### Edge Case Handling
+- Always check: player exists, player alive, player not spectator
+- Always validate: keybind from real player (not fake player)
+- Always cleanup: remove tags on logout, remove effects on death
+
+---
+
+## 🔧 DEVELOPMENT PRIORITIES
+
+### Phase 1 (Core Systems):
+1. Keybind registration system
+2. Basic packet networking
+3. Player capability for data storage
+4. Attribute buff system
+
+### Phase 2 (Simple Abilities):
+1. Kamui Travel (simplest teleport)
+2. Basic Genjutsu (AI manipulation)
+3. Black Receivers (custom item)
+
+### Phase 3 (Complex Abilities):
+1. Kamui Intangibility (collision manipulation)
+2. Kamui Attack (entity teleportation)
+3. Kamui Warp (position saving)
+
+### Phase 4 (Advanced Features):
+1. Advanced Genjutsu (AI goal selectors)
+2. Location Marker GUI (custom UI)
+3. Kamui Dimension (world generation)
+
+---
+
+## 📚 REFERENCE IMPLEMENTATIONS
+
+### Similar Mods to Study:
+1. **Waystones** - Waypoint system, teleportation GUI
+2. **RFTools** - Dimension creation, teleportation
+3. **Vampirism** - Ability system, skill trees
+4. **Ars Nouveau** - Spell system, keybinds
+5. **Iron's Spells 'n Spellbooks** - Combat abilities, visual effects
+
+### Useful NeoForge APIs:
+- `KeyMapping` - Keybind registration
+- `PlayerTickEvent` - Per-tick player updates
+- `LivingHurtEvent` - Damage cancellation
+- `MenuType` - Custom GUI creation
+- `SimpleChannel` - Packet networking
+- `AttachCapabilitiesEvent` - Player data storage
+- `Level.teleportTo()` - Entity teleportation
+
+---
+
+## 🐛 KNOWN ISSUES TO AVOID
+
+1. **Don't use client-side only for abilities** - Always validate server-side
+2. **Don't forget to sync particles** - Use proper packet for client effects
+3. **Don't leak entities** - Always cleanup tags and references
+4. **Don't break multiplayer** - Test with 2+ players
+5. **Don't spam packets** - Batch updates when possible
+6. **Don't trust client position** - Always use server position for logic
+7. **Don't forget dimension checks** - Some abilities shouldn't work in certain dimensions
+
+---
+
+## ✅ DEFINITION OF DONE
+
+An ability is "complete" when:
+- [ ] Keybind registered and functional
+- [ ] Server-side logic implemented
+- [ ] Client receives proper feedback
+- [ ] Particle effects display correctly
+- [ ] Sound effects play
+- [ ] Action bar messages appear
+- [ ] Edge cases handled
+- [ ] Works in multiplayer
+- [ ] No console errors
+- [ ] Data persists through logout/login
+- [ ] Cooldowns function properly
+- [ ] Ability can be interrupted safely
+
+---
+
+## 📝 NOTES & QUESTIONS
+
+[Space for developer to add notes, questions, or modifications during development]
+
+---
+
+**Document Version:** 1.0  
+**Last Updated:** [Current Date]  
+**Status:** Ready for Development
+
+---
